@@ -87,7 +87,7 @@ function sendMsg($from, $to, $msg) {
 }
 function getNewMsgs($userId, $lastMsg) {
 	global $conn;
-	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to FROM chats c where c.to = :userId AND c.id > :lastMsg");
+	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to, u.first_name, u.last_name FROM chats c INNER JOIN users u ON u.id = c.from where c.to = :userId AND c.id > :lastMsg");
 	$stmt->bindParam('userId', $userId);
 	$stmt->bindParam('lastMsg', $lastMsg);
 	$stmt->execute();

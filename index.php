@@ -74,7 +74,7 @@ $lastMsgId = getLatestMsg($userId);
            });
 			$("#sendbtn").click(function(){
 				var msg = $("#msgtxt").val();
-				var id = $(this).data('uid');
+				var id = $(this).attr('data-uid');
 				var obj = $(this);
 				if(msg != ""){
 					$.ajax({
@@ -124,6 +124,39 @@ $lastMsgId = getLatestMsg($userId);
 								}
 								$('#chat_area').scrollTop($('#chat_area')[0].scrollHeight);
 				        	}
+				        	if(data.newsides) {
+				        		var arr1 = Object.values(data.newsides);
+								$.each(arr1, function(index, value){
+									$("#chat-list").append(value);
+									$(".loadchat").unbind().bind("click", function(){
+										$("#msgtxt").val('');
+										$('.loadchat').each(function( index ) {
+											$(this).removeClass('active');
+										});
+										$(this).removeClass('newchat');
+										$(this).addClass('active');
+							              var liId = $(this).attr('id');
+							              var id = liId.replace("chat-", "");
+											$.ajax({
+												url: "<?php echo $basePath;?>getmsgs.php",
+												type: "post",
+												data:"u1=<?php echo $userId?>&u2="+id,
+												success: function(result){
+													$("#chat_area").html(result);
+													$('#chat_area').scrollTop($('#chat_area')[0].scrollHeight);
+													$('#msgArea').show();
+													$('#sendbtn').attr('data-uid', id);
+													//$("#chat_area").animate({ scrollTop: $('#chat_area').prop("scrollHeight")}, 1000);
+												},
+												beforeSend : function(){
+											       //show loader
+													$("#chat_area").html('<img src="<?php echo $imgPath;?>ajax-loader.gif" alt="Loading...">');
+											    }
+								      		});
+									});
+								});
+								
+				        	}
 				        }
 				        //lastMs = '50';
 			        }
@@ -171,7 +204,7 @@ $lastMsgId = getLatestMsg($userId);
 						</div>
 						<div class="member_list">
 							<?php if($chatList):?>
-							<ul class="list-unstyled">
+							<ul id="chat-list" class="list-unstyled">
 								<?php foreach($chatList as $userId => $list):?>
 								<li id="chat-<?php echo $userId;?>" class="left clearfix loadchat">
 									<span class="chat-img pull-left"> <img
