@@ -42,9 +42,6 @@ $lastMsgId = getLatestMsg($userId);
             else $('head > link').filter(':first').replaceWith(defaultCSS); 
         }
         $( document ).ready(function() {
-        	<?php if(isset($receiverId)) { ?>
-        	setTimeout(function(){ $("#chat-<?php echo $receiverId;?>").trigger("click"); }, 300);
-          	<?php } ?>
           $('.loadchat').click(function(){
 				$("#msgtxt").val('');
               var liId = $(this).attr('id');
@@ -94,10 +91,11 @@ $lastMsgId = getLatestMsg($userId);
 			        success: function(data) {
 				        //if(data)
 			        	lastMs = '50';
+			        	//setTimeout(seekChannel(), 500000000);
 			        }
 				});
 			}
-			setInterval(function(){ seekChannel(); }, 5000);
+			setInterval(function(){ alert("Hello"); }, 3000);
         });
     </script>
 </head>

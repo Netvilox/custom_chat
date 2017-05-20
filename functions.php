@@ -33,6 +33,19 @@ function getChatList($userId) {
 	return $users;
 	//print_r($users); die;
 }
+function getLatestMsg($userId = 0) {
+	global $conn;
+	$stmt = $conn->prepare("SELECT c.id FROM chats c where c.to = :userId OR c.from = :userId order by c.id DESC limit 1");
+	$stmt->bindParam(':userId', $userId);
+	$stmt->bindParam(':userId', $userId);
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetch();
+	if($res)
+		return $res['id'];
+	else
+		return 0;
+}
 function changeUserStatus($userId = 0, $status = 1) {
 	global $conn;
 	$stmt = $conn->prepare("SELECT id FROM session where user_id = $userId");
@@ -70,4 +83,37 @@ function sendMsg($from, $to, $msg) {
 	$stmt->bindParam(':to', $to);
 	$stmt->bindParam(':msg', $msg);
 	$stmt->execute();
+}
+function getNewMsgs($userId, $lastMsg) {
+	global $conn;
+	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to FROM chats c where c.to = :userId AND c.id > :lastMsg");
+	$stmt->bindParam('userId', $userId);
+	$stmt->bindParam('lastMsg', $lastMsg);
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetchAll();
+	return $res;
+}
+function newUser($userId, $users) {
+	global $conn;
+	$status = 0;
+	$stmt = $conn->prepare("SELECT id, status FROM session where user_id = $userId");
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$result = $stmt->fetch();
+	if(!$result) {
+		$stmt = $conn->prepare("INSERT into session (user_id, status) VALUES (:userId, :status)");
+		$stmt->bindParam(':userId', $userId);
+		$stmt->bindParam(':status', $status);
+		$stmt->execute();
+	} else {
+		$status = $result['status'];
+	}
+	$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name FROM users u where id = $userId");
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetch();
+	$users[$res['id']]['name'] = $res['first_name'].' '. $res['last_name'];
+	$users[$res['id']]['status'] = $status;
+	return $users;
 }
