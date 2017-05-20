@@ -53,12 +53,21 @@ function changeUserStatus($userId = 0, $status = 1) {
 }
 function getChatMsgs($userId, $otherUserId) {
 	global $conn;
-	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to FROM chats c where (c.from = :userId AND c.to = :anotherUserId) OR (c.from = :userId AND c.to = :anotherUserId)");
+	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to FROM chats c where (c.from = :userId AND c.to = :anotherUserId) OR (c.to = :userId AND c.from = :anotherUserId)");
+	$stmt->bindParam('userId', $userId);
+	$stmt->bindParam('anotherUserId', $otherUserId);
 	$stmt->bindParam('userId', $userId);
 	$stmt->bindParam('anotherUserId', $otherUserId);
 	$stmt->execute();
 	$stmt->setFetchMode(PDO::FETCH_ASSOC);
 	$res = $stmt->fetchAll();
-	print_r($res);
 	return $res;
+}
+function sendMsg($from, $to, $msg) {
+	global $conn;
+	$stmt = $conn->prepare("INSERT into chats (chats.from, chats.to, message) VALUES (:from, :to, :msg)");
+	$stmt->bindParam(':from', $from);
+	$stmt->bindParam(':to', $to);
+	$stmt->bindParam(':msg', $msg);
+	$stmt->execute();
 }
