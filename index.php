@@ -4,7 +4,7 @@ $basePath = '/ch/';
 $cssPath = $basePath . 'assets/css/';
 $jsPath = $basePath . 'assets/js/';
 $imgPath = $basePath . 'assets/img/';
-$userId = 4; //get this userId from session
+$userId = $_GET['uid']; //get this userId from session
 changeUserStatus($userId, 1); //this function will change status of user in session table
 $chatList = getChatList($userId);
 if(isset($_GET['rid'])) {
@@ -37,6 +37,7 @@ $lastMsgId = getLatestMsg($userId);
         //window.alert = function(){};
         var defaultCSS = document.getElementById('bootstrap-css');
         var lastMs = '<?php echo $lastMsgId;?>';
+        var list = '<?php echo json_encode(array_keys($chatList));?>';
         function changeCSS(css){
             if(css) $('head > link').filter(':first').replaceWith('<link rel="stylesheet" href="'+ css +'" type="text/css" />'); 
             else $('head > link').filter(':first').replaceWith(defaultCSS); 
@@ -46,7 +47,12 @@ $lastMsgId = getLatestMsg($userId);
         	setTimeout(function(){ $("#chat-<?php echo $receiverId;?>").trigger("click"); }, 300);
           	<?php } ?>
           $('.loadchat').click(function(){
-				$("#msgtxt").val('');
+			$("#msgtxt").val('');
+			$('.loadchat').each(function( index ) {
+				$(this).removeClass('active');
+			});
+			$(this).removeClass('newchat');
+			$(this).addClass('active');
               var liId = $(this).attr('id');
               var id = liId.replace("chat-", "");
 				$.ajax({
@@ -69,31 +75,57 @@ $lastMsgId = getLatestMsg($userId);
 			$("#sendbtn").click(function(){
 				var msg = $("#msgtxt").val();
 				var id = $(this).data('uid');
+				var obj = $(this);
 				if(msg != ""){
 					$.ajax({
 						url: "<?php echo $basePath;?>sendmsg.php",
 						type: "post",
 						data:"u1=<?php echo $userId?>&u2="+id+"&msg="+msg,
 						success: function(result){
-							$("#chat_area").find('ul').append(result);
+							if($("#chat_area").find('ul').length)
+								$("#chat_area").find('ul').append(result);
+							else {
+								$("#chat_area").html('<ul class="list-unstyled">'+result+"</ul>");
+							}
 							$('#chat_area').scrollTop($('#chat_area')[0].scrollHeight);
 							$("#msgtxt").val('');
+							obj.html('Send');
 						},
 						beforeSend : function(){
+							obj.html('Sending...');
 					    }
 		      		});	
 				}
 			});
 			function seekChannel() {
 				var pass_data=5;
+				var currChat = $("#sendbtn").attr('data-uid');
 				$.ajax({
 			        url: "<?php echo $basePath;?>seek.php",
 			        //async:false, // set async false to wait for previous response
 			        type: "post",
-			        data:"u1=<?php echo $userId;?>&lastMsg="+lastMs,
+			        dataType: "json",
+			        data:"u1=<?php echo $userId;?>&lastMsg="+lastMs+"&currChat="+currChat+"&list="+list,
 			        success: function(data) {
-				        //if(data)
-			        	lastMs = '50';
+				        if(data) {
+					        if(data.lastMsg)
+				        		lastMs = data.lastMsg;
+				        	if(data.newChats) {
+				        		var arr = Object.values(data.newChats);
+								$.each(arr, function(index, value){
+									$("#chat-"+value).addClass('newchat');
+								})
+				        	}
+				        	if(data.chatHTML) {
+				        		if($("#chat_area").find('ul').length)
+									$("#chat_area").find('ul').append(data.chatHTML);
+								else {
+									$("#chat_area").html('<ul class="list-unstyled">'+data.chatHTML+"</ul>");
+								}
+								$('#chat_area').scrollTop($('#chat_area')[0].scrollHeight);
+				        	}
+				        }
+				        //lastMs = '50';
 			        }
 				});
 			}

@@ -228,8 +228,14 @@
 	width: 100%;
 }
 
-.member_list li:hover {
+.member_list li:hover, .member_list li.active {
 	background: #428bca none repeat scroll 0 0;
+	color: #fff;
+	cursor: pointer;
+}
+
+.member_list li.newchat {
+	background: #e8a711 none repeat scroll 0 0;
 	color: #fff;
 	cursor: pointer;
 }
