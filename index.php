@@ -208,7 +208,7 @@ $lastMsgId = getLatestMsg($userId);
 								<?php foreach($chatList as $userId => $list):?>
 								<li id="chat-<?php echo $userId;?>" class="left clearfix loadchat">
 									<span class="chat-img pull-left"> <img
-											src="https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg"
+											src="<?php echo $imgPath.$list['img'];?>"
 											alt="User Avatar" class="img-circle">
 									</span>
 									<div class="chat-body clearfix">

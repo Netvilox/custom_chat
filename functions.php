@@ -3,7 +3,7 @@ error_reporting (0);
 require_once 'db.php';
 function getChatList($userId) {
 	global $conn;
-	$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, s.status FROM chats c INNER JOIN users u ON u.id = c.from INNER JOIN session s on s.user_id = c.from where c.to = :userId group by(c.from)");
+	$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, u.p_img, s.status FROM chats c INNER JOIN users u ON u.id = c.from INNER JOIN session s on s.user_id = c.from where c.to = :userId group by(c.from)");
 	$stmt->bindParam('userId', $userId);
 	$stmt->execute();
 	$stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -14,13 +14,14 @@ function getChatList($userId) {
 		foreach($fromResult as $res) {
 			$users[$res['id']]['name'] = $res['first_name'].' '. $res['last_name'];
 			$users[$res['id']]['status'] = $res['status'];
+			$users[$res['id']]['img'] = $res['p_img'];
 		}
 		$frmIds = implode(',', array_keys($users));
 	}
 	if($frmIds)
-		$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, s.status FROM chats c INNER JOIN users u ON u.id = c.to  INNER JOIN session s on s.user_id = c.from where c.from = :userId AND c.to NOT IN($frmIds) group by(c.from)");
+		$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, u.p_img, s.status FROM chats c INNER JOIN users u ON u.id = c.to  INNER JOIN session s on s.user_id = c.from where c.from = :userId AND c.to NOT IN($frmIds) group by(c.from)");
 	else 
-		$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, s.status FROM chats c INNER JOIN users u ON u.id = c.to  INNER JOIN session s on s.user_id = c.from where c.from = :userId group by(c.from)");
+		$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, u.p_img, s.status FROM chats c INNER JOIN users u ON u.id = c.to  INNER JOIN session s on s.user_id = c.from where c.from = :userId group by(c.from)");
 	$stmt->bindParam('userId', $userId);
 	$stmt->execute();
 	$stmt->setFetchMode(PDO::FETCH_ASSOC);
@@ -29,6 +30,7 @@ function getChatList($userId) {
 		foreach($toResult as $res) {
 			$users[$res['id']]['name'] = $res['first_name'].' '. $res['last_name'];
 			$users[$res['id']]['status'] = $res['status'];
+			$users[$res['id']]['img'] = $res['p_img'];
 		}
 	}
 	return $users;
@@ -110,11 +112,12 @@ function newUser($userId, $users) {
 	} else {
 		$status = $result['status'];
 	}
-	$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name FROM users u where id = $userId");
+	$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, u.p_img FROM users u where id = $userId");
 	$stmt->execute();
 	$stmt->setFetchMode(PDO::FETCH_ASSOC);
 	$res = $stmt->fetch();
 	$users[$res['id']]['name'] = $res['first_name'].' '. $res['last_name'];
 	$users[$res['id']]['status'] = $status;
+	$users[$res['id']]['img'] = $res['p_img'];
 	return $users;
 }
