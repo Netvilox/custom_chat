@@ -14,7 +14,7 @@ if($msgs) {
 	foreach ($msgs as $msg) {
 		if($msg['from'] == $currChat) {
 			$data['chatHTML'] .= '<li class="left clearfix"><span class="chat-img1 pull-left"> <img
-									src="https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg"
+									src="'.$imgPath.$msg['p_img'].'"
 									alt="User Avatar" class="img-circle">
 								</span>
 								<div class="chat-body1 clearfix">
@@ -23,9 +23,10 @@ if($msgs) {
 		} elseif(in_array($msg['from'], $list)) {
 			$data['newChats'][$msg['from']] = $msg['from'];
 		} else {
+			$otherUserDetails = getUser($currChat);
 			$data['newsides'][$msg['from']] = '<li id="chat-'.$msg['from'].'" class="left clearfix loadchat newchat">
 									<span class="chat-img pull-left"> <img
-											src="https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg"
+											src="'.$imgPath.$msg['p_img'].'"
 											alt="User Avatar" class="img-circle">
 									</span>
 									<div class="chat-body clearfix">

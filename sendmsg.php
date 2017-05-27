@@ -1,13 +1,16 @@
 <?php
 require_once 'functions.php';
+$basePath = '/ch/';
+$imgPath = $basePath . 'assets/img/';
 $userId = $_POST['u1']; //current loggedin user
 $anotherId = $_POST['u2'];
+$img = $_POST['img'];
 $msg = strip_tags($_POST['msg']);
 sendMsg($userId, $anotherId, $msg);
 ?>
 <li class="left clearfix admin_chat"><span
 			class="chat-img1 pull-right"> <img
-				src="https://lh6.googleusercontent.com/-y-MY2satK-E/AAAAAAAAAAI/AAAAAAAAAJU/ER_hFddBheQ/photo.jpg"
+				src="<?php echo $imgPath.$img;?>"
 				alt="User Avatar" class="img-circle">
 </span>
 	<div class="chat-body1 clearfix">

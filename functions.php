@@ -89,7 +89,7 @@ function sendMsg($from, $to, $msg) {
 }
 function getNewMsgs($userId, $lastMsg) {
 	global $conn;
-	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to, u.first_name, u.last_name FROM chats c INNER JOIN users u ON u.id = c.from where c.to = :userId AND c.id > :lastMsg");
+	$stmt = $conn->prepare("SELECT c.id, c.message, c.sent, c.recd, c.from, c.to, u.first_name, u.last_name, u.p_img FROM chats c INNER JOIN users u ON u.id = c.from where c.to = :userId AND c.id > :lastMsg");
 	$stmt->bindParam('userId', $userId);
 	$stmt->bindParam('lastMsg', $lastMsg);
 	$stmt->execute();
@@ -120,4 +120,13 @@ function newUser($userId, $users) {
 	$users[$res['id']]['status'] = $status;
 	$users[$res['id']]['img'] = $res['p_img'];
 	return $users;
+}
+
+function getUser($userId) {
+	global $conn;
+	$stmt = $conn->prepare("SELECT u.id, u.first_name, u.last_name, u.p_img FROM users u where id = $userId");
+	$stmt->execute();
+	$stmt->setFetchMode(PDO::FETCH_ASSOC);
+	$res = $stmt->fetch();
+	return $res;
 }

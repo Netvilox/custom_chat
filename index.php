@@ -5,6 +5,7 @@ $cssPath = $basePath . 'assets/css/';
 $jsPath = $basePath . 'assets/js/';
 $imgPath = $basePath . 'assets/img/';
 $userId = $_GET['uid']; //get this userId from session
+$userImg = 'u1.png'; //get this user image from session, this will be image for current user
 changeUserStatus($userId, 1); //this function will change status of user in session table
 $chatList = getChatList($userId);
 if(isset($_GET['rid'])) {
@@ -58,13 +59,12 @@ $lastMsgId = getLatestMsg($userId);
 				$.ajax({
 					url: "<?php echo $basePath;?>getmsgs.php",
 					type: "post",
-					data:"u1=<?php echo $userId?>&u2="+id,
+					data:"u1=<?php echo $userId?>&u2="+id+"&img=<?php echo $userImg;?>",
 					success: function(result){
 						$("#chat_area").html(result);
 						$('#chat_area').scrollTop($('#chat_area')[0].scrollHeight);
 						$('#msgArea').show();
 						$('#sendbtn').attr('data-uid', id);
-						//$("#chat_area").animate({ scrollTop: $('#chat_area').prop("scrollHeight")}, 1000);
 					},
 					beforeSend : function(){
 				       //show loader
@@ -80,7 +80,7 @@ $lastMsgId = getLatestMsg($userId);
 					$.ajax({
 						url: "<?php echo $basePath;?>sendmsg.php",
 						type: "post",
-						data:"u1=<?php echo $userId?>&u2="+id+"&msg="+msg,
+						data:"u1=<?php echo $userId?>&u2="+id+"&msg="+msg+"&img=<?php echo $userImg;?>",
 						success: function(result){
 							if($("#chat_area").find('ul').length)
 								$("#chat_area").find('ul').append(result);
